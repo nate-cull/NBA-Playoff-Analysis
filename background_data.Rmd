@@ -1,0 +1,162 @@
+---
+title: "NBA_stats"
+author: "Benjamin Siglow"
+date: "5/1/2021"
+output: html_document
+---
+```{r}
+#This will let you do the t test we plan for the final points
+#install.packages('Hotelling')
+```
+
+```{r}
+library('Hotelling')
+library('nbastatR')
+library('tidyverse')
+library(readxl)
+library(rvest)
+library(lubridate)
+```
+
+
+```{r ::scrape playoff 2020}
+url <-  "https://www.basketball-reference.com/playoffs/NBA_2020.html"
+playoffs_2020 <-  read_html(url) %>%
+html_nodes(xpath = '//*[@id="team-stats-per_game"]') %>%
+html_table() %>%
+data.frame()
+
+playoffs_2020 <- playoffs_2020[-c(length(playoffs_2020$Rk)), ]
+
+```
+
+
+```{r ::scrape playoff 2019}
+url <-  "https://www.basketball-reference.comxpath = '/html/body/div[2]/div[5]/div[4]/div[4]/table[1]'/playoffs/NBA_2019.html"
+playoffs_2019 <-  read_html(url) %>%
+html_nodes(xpath = '//*[@id="team-stats-per_game"]') %>%
+html_table() %>%
+data.frame()
+
+playoffs_2019 <- playoffs_2019[-c(length(playoffs_2019$Rk)), ]
+```
+
+```{r ::scrape playoff 2018}
+url <-  "https://www.basketball-reference.com/playoffs/NBA_2018.html"
+playoffs_2018 <-  read_html(url) %>%
+html_nodes(xpath = '//*[@id="team-stats-per_game"]') %>%
+html_table() %>%
+data.frame()
+
+playoffs_2018 <- playoffs_2018[-c(length(playoffs_2018$Rk)), ]
+```
+
+```{r ::scrape playoff 2017}
+url <-  "https://www.basketball-reference.com/playoffs/NBA_2017.html"
+playoffs_2017 <-  read_html(url) %>%
+html_nodes(xpath = '//*[@id="team-stats-per_game"]') %>%
+html_table() %>%
+data.frame()
+
+playoffs_2017 <- playoffs_2017[-c(length(playoffs_2017$Rk)), ]
+```
+
+```{r ::scrape playoff 2016}
+url <-  "https://www.basketball-reference.com/playoffs/NBA_2016.html"
+playoffs_2016 <-  read_html(url) %>%
+html_nodes(xpath = '//*[@id="team-stats-per_game"]') %>%
+html_table() %>%
+data.frame()
+
+playoffs_2016 <- playoffs_2016[-c(length(playoffs_2016$Rk)), ]
+```
+
+```{r ::scrape playoff 2015}
+url <-  "https://www.basketball-reference.com/playoffs/NBA_2015.html"
+playoffs_2015 <-  read_html(url) %>%
+html_nodes(xpath = '//*[@id="team-stats-per_game"]') %>%
+html_table() %>%
+data.frame()
+
+playoffs_2015 <- playoffs_2015[-c(length(playoffs_2015$Rk)), ]
+```
+
+
+```{r}
+playoffs <- rbind(playoffs_2015,playoffs_2016,playoffs_2017,playoffs_2018,playoffs_2015,playoffs_2019,playoffs_2020)
+```
+
+```{r}
+playoffs_full <- playoffs[,-c(1,3,4)]
+```
+
+```{r}
+
+url <-  'https://www.basketball-reference.com/leagues/NBA_2021.html'
+
+totalsdf =  url %>%
+read_html %>%
+html_nodes(xpath = '//comment()') %>%
+html_text() %>%
+paste(collapse='') %>%
+read_html() %>% 
+html_node("#team-stats-base") %>% 
+html_table()
+```
+
+```{r}
+for (i in 15:20) {
+    url <-  'https://www.basketball-reference.com/leagues/NBA_20'
+    b <- paste(i,'.html',sep = '')
+    url <- paste(url,b,sep = '')
+    reg_prim <- url %>%
+          read_html %>%
+          html_nodes(xpath = '//comment()') %>%
+          html_text() %>%
+          paste(collapse='') %>%
+          read_html() %>% 
+          html_node("#team-stats-base") %>% 
+          html_table() 
+    if(i == 15){
+      regseason2015 <- reg_prim
+    }else if(i == 16){
+      regseason2016 <- reg_prim
+    }else if(i == 17){
+      regseason2017 <- reg_prim
+    }else if(i == 18){
+      regseason2018 <- reg_prim
+    }else if(i == 19){
+      regseason2019 <- reg_prim
+    }else{
+      regseason2020 <- reg_prim
+    }
+      
+
+}
+```
+
+```{r}
+regseason_full <- rbind(regseason2015,regseason2016,regseason2017,regseason2018,regseason2019,regseason2020)
+```
+
+
+```{r}
+colnames(playoffs_full)
+colnames(regseason_full)
+colnames(regseason_full)[14] <- 'FT.'
+regseason_full <- regseason_full[,-c(1,3,4)]
+```
+
+```{r}
+names <- c("Team", "FG",   "FGA",  "FG%",  "3P",   "3PA","3P%",  "2P",   "2PA",  "2P%",  "FT","FTA",  "FT%",  "ORB",  "DRB",  "TRB",  "AST",  "STL",  "BLK",  "TOV",  "PF",   "PTS")
+```
+
+```{r}
+colnames(playoffs_full) <- names
+colnames(regseason_full) <- names
+```
+
+
+
+
+
